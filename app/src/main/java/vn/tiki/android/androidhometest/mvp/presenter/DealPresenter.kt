@@ -33,10 +33,10 @@ class DealPresenter(private val mDealView: DealContract.View) : DealContract.Pre
         task = MockRemote()
         task.getData(object : DataCallback<List<Deal>?> {
             override fun onResult(result: List<Deal>?) {
-                if (result != null && result.size > 0) {
+                if (result != null && result.isNotEmpty()) {
                     // The view may not be able to handle UI updates anymore
                     if (!mDealView.isActive) {
-                        Log.e("TAG", "FilmView not active")
+                        Log.e("TAG", "View not active")
                         return
                     }
                     mDealView.showDealList(result)

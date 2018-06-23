@@ -30,7 +30,7 @@ class DealAdapter internal constructor(private val context: Context, private val
 
     private val TAG = "Message"
 
-    private var mData  = mutableListOf<Deal>()
+    private var mData = mutableListOf<Deal>()
 
     private val countDownMap = SparseArray<CountDownTimer>()
 
@@ -58,12 +58,6 @@ class DealAdapter internal constructor(private val context: Context, private val
 
         this.mData = filmList.toMutableList()
         notifyDataSetChanged()
-
-        //find out the maximum time the timer
-        var maxTime = System.currentTimeMillis()
-        for (item in mData) {
-            maxTime = Math.max(maxTime, item.endDate.time)
-        }
     }
 
 
@@ -86,44 +80,48 @@ class DealAdapter internal constructor(private val context: Context, private val
                 .load(deal.productThumbnail)
                 .into(holder.ivPoster)
 
-        val current = Date()
-
-
         if (holder.countDownTimer != null) {
             holder.countDownTimer!!.cancel()
         }
 
+        val current = Date()
+
         val time = deal.endDate.time - current.time
         if (time > 0) {
-
             holder.countDownTimer = object : CountDownTimer(time, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                     val timeRemain = TimeUtil.computeDiff(Date(), deal.endDate)
-                    val timeString = timeRemain[TimeUnit.HOURS].toString() + " giờ " + timeRemain[TimeUnit.MINUTES] + " phút " + timeRemain[TimeUnit.SECONDS] + " giây"
+                    val timeString = timeRemain[TimeUnit.HOURS].toString() + " giờ " +
+                            timeRemain[TimeUnit.MINUTES] + " phút " + timeRemain[TimeUnit.SECONDS] + " giây"
                     holder.tvTime.text = timeString
                 }
 
                 override fun onFinish() {
-                    if (holder.adapterPosition >= 0 && holder.adapterPosition < mData.size) {
-                        Handler().post {
-                            mData.removeAt(holder.adapterPosition)
-                            notifyItemRemoved(holder.adapterPosition)
-                        }
-                    }
+                    removeItem(holder.adapterPosition)
+
 
                 }
             }.start()
 
             countDownMap.put(holder.tvTime.hashCode(), holder.countDownTimer)
         } else {
-            if (holder.adapterPosition >= 0 && holder.adapterPosition < mData.size) {
-                Handler().post {
-                    mData.removeAt(holder.adapterPosition)
-                    notifyItemRemoved(holder.adapterPosition)
-                }
-
-            }
+            removeItem(holder.adapterPosition)
         }
+
+    }
+
+    fun removeItem(pos: Int) {
+        Handler().post {
+            if (pos >= 0 && pos < mData.size) {
+                mData.removeAt(pos)
+                notifyItemRemoved(pos)
+            }
+            if (mData.size == 0) {
+                mListener.onEmptyData()
+            }
+
+        }
+
 
     }
 
