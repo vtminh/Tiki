@@ -20,7 +20,9 @@ class MockRemote : AsyncTask<Unit, Unit, List<Deal>>(){
 
     public fun getData( callback: DataCallback<List<Deal>?>){
         mCallback = callback
+
         this.execute()
+
     }
 
 }

@@ -11,7 +11,7 @@ import vn.tiki.android.androidhometest.mvp.model.remote.api.MockRemote
 class DealPresenter(private val mDealView: DealContract.View) : DealContract.Presenter {
 
     companion object {
-        val task = MockRemote()
+        lateinit var task : MockRemote
     }
 
     init {
@@ -30,6 +30,7 @@ class DealPresenter(private val mDealView: DealContract.View) : DealContract.Pre
     override fun start() {}
 
     private fun loadFilm(forceUpdate: Boolean) {
+        task = MockRemote()
         task.getData(object : DataCallback<List<Deal>?> {
             override fun onResult(result: List<Deal>?) {
                 if (result != null && result.size > 0) {
